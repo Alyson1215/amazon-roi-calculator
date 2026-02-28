@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Amazon Listing ROI Calculator – Free Tool for FBA Sellers</title>
+<meta name="description" content="Free Amazon FBA profit calculator. Enter your product price, COGS, FBA fees, and PPC spend to instantly see your real net profit and ROI." />
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #f5a623;
+    --accent2: #e8562a;
+    --green: #27c987;
+    --red: #e85555;
+    --text: #e8eaf6;
+    --muted: #8b90b0;
+    --radius: 12px;
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; letter-spacing: -0.3px; }
+  .logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .badge { font-size: 0.7rem; background: var(--accent2); color: #fff; padding: 3px 8px; border-radius: 20px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 52px 24px 40px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .hero h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; }
+  .hero h1 span { color: var(--accent); }
+  .hero p { margin-top: 14px; color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
+
+  /* CATEGORY PILLS */
+  .categories { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px; }
+  .pill {
+    padding: 5px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+    border: 1px solid var(--border); color: var(--muted); cursor: pointer;
+    transition: all .15s ease; user-select: none;
+  }
+  .pill.active, .pill:hover { border-color: var(--accent); color: var(--accent); background: rgba(245,166,35,.08); }
+
+  /* MAIN LAYOUT */
+  .main { max-width: 1000px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 680px) { .main { grid-template-columns: 1fr; } }
+
+  /* CARD */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
+  .card-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 22px; }
+
+  /* INPUTS */
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--muted); margin-bottom: 7px; }
+  .field label .tooltip { cursor: help; font-size: 0.75rem; margin-left: 4px; opacity: 0.6; }
+  .input-wrap { position: relative; display: flex; align-items: center; }
+  .input-prefix, .input-suffix {
+    position: absolute; font-size: 0.95rem; color: var(--muted); pointer-events: none; font-weight: 600;
+  }
+  .input-prefix { left: 12px; }
+  .input-suffix { right: 12px; }
+  input[type="number"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 1rem;
+    font-family: var(--font);
+    padding: 10px 16px;
+    outline: none;
+    transition: border-color .15s;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type="number"]:focus { border-color: var(--accent); }
+  .has-prefix input { padding-left: 28px; }
+  .has-suffix input { padding-right: 36px; }
+
+  /* SLIDER */
+  .slider-wrap { margin-top: 6px; }
+  input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
+    accent-color: var(--accent);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px;
+    background: var(--accent); border-radius: 50%; cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(245,166,35,.2);
+  }
+
+  /* RESULTS */
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+  .metric {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; text-align: center;
+  }
+  .metric .val { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
+  .metric .lbl { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .metric.profit .val { color: var(--green); }
+  .metric.roi .val { color: var(--accent); }
+  .metric.margin .val { color: var(--accent); }
+  .metric.break-even .val { color: var(--muted); }
+  .metric.negative .val { color: var(--red) !important; }
+
+  /* VERDICT */
+  .verdict {
+    border-radius: 10px; padding: 16px 18px;
+    font-size: 0.9rem; font-weight: 600; line-height: 1.5;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .verdict.good { background: rgba(39,201,135,.1); border: 1px solid rgba(39,201,135,.25); color: var(--green); }
+  .verdict.ok   { background: rgba(245,166,35,.1); border: 1px solid rgba(245,166,35,.25); color: var(--accent); }
+  .verdict.bad  { background: rgba(232,85,85,.1);  border: 1px solid rgba(232,85,85,.25);  color: var(--red); }
+  .verdict-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* BREAKDOWN BAR */
+  .breakdown { margin-top: 22px; }
+  .breakdown-title { font-size: 0.82rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .bar-wrap { background: var(--surface2); border-radius: 6px; height: 10px; overflow: hidden; display: flex; margin-bottom: 6px; }
+  .bar-segment { height: 100%; transition: width .3s ease; }
+  .bar-cogs { background: #e85555; }
+  .bar-fba  { background: #f5a623; }
+  .bar-ppc  { background: #7c6af5; }
+  .bar-profit { background: #27c987; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* TIPS */
+  .tips { margin-top: 24px; }
+  .tip { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; line-height: 1.5; color: var(--muted); }
+  .tip:last-child { border-bottom: none; }
+  .tip-icon { font-size: 1rem; flex-shrink: 0; }
+
+  /* FOOTER */
+  footer { text-align: center; padding: 40px 20px 0; color: var(--muted); font-size: 0.82rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* CTA */
+  .cta-bar {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px 28px; margin-top: 24px; text-align: center;
+  }
+  .cta-bar h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+  .cta-bar p { color: var(--muted); font-size: 0.88rem; margin-bottom: 16px; }
+  .cta-btn {
+    display: inline-block; background: var(--accent); color: #000; font-weight: 700;
+    font-size: 0.9rem; padding: 11px 24px; border-radius: 8px; text-decoration: none;
+    transition: opacity .15s; cursor: pointer; border: none; font-family: var(--font);
+  }
+  .cta-btn:hover { opacity: 0.88; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">📦</div>
+    Amazon FBA ROI Calculator
+  </div>
+  <span class="badge">Free Tool</span>
+</header>
+
+<div class="hero">
+  <h1>Know your <span>real profit</span><br>before you list</h1>
+  <p>Enter your numbers below. Instantly see net profit, ROI, and whether your listing is worth scaling — or needs fixing first.</p>
+  <div class="categories">
+    <div class="pill active" onclick="preset('pet')">🐾 Pet</div>
+    <div class="pill" onclick="preset('home')">🏠 Home</div>
+    <div class="pill" onclick="preset('skincare')">✨ Skincare</div>
+    <div class="pill" onclick="preset('party')">🎉 Party Decor</div>
+    <div class="pill" onclick="preset('custom')">Custom</div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- INPUT CARD -->
+  <div class="card">
+    <div class="card-title">Your Listing Numbers</div>
+
+    <div class="field">
+      <label>Sale Price <span class="tooltip" title="The price your product sells for on Amazon">ⓘ</span></label>
+      <div class="input-wrap has-prefix">
+        <span class="input-prefix">$</span>
+        <input type="number" id="price" value="29.99" min="0" step="0.01" oninput="calc()" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Cost of Goods (COGS) <span class="tooltip" title="What you pay per unit including manufacturing and shipping to Amazon">ⓘ</span></label>
+      <div class="input-wrap has-prefix">
+        <span class="input-prefix">$</span>
+        <input type="number" id="cogs" value="8.00" min="0" step="0.01" oninput="calc()" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>FBA Fulfillment Fee <span class="tooltip" title="Amazon's fee to pick, pack, and ship your order. Typical range $3–$7 for small standard items.">ⓘ</span></label>
+      <div class="input-wrap has-prefix">
+        <span class="input-prefix">$</span>
+        <input type="number" id="fba" value="4.50" min="0" step="0.01" oninput="calc()" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Amazon Referral Fee <span class="tooltip" title="Usually 8–15% of sale price depending on category">ⓘ</span></label>
+      <div class="input-wrap has-suffix">
+        <span class="input-suffix">%</span>
+        <input type="number" id="referral" value="15" min="0" max="100" step="0.5" oninput="calc()" />
+      </div>
+      <div class="slider-wrap"><input type="range" id="referral_range" min="6" max="20" step="0.5" value="15" oninput="syncRange('referral', this.value)" /></div>
+    </div>
+
+    <div class="field">
+      <label>Monthly PPC Spend <span class="tooltip" title="Your total ad spend per month. Divide by monthly units to get per-unit ad cost.">ⓘ</span></label>
+      <div class="input-wrap has-prefix">
+        <span class="input-prefix">$</span>
+        <input type="number" id="ppc_total" value="300" min="0" step="10" oninput="calc()" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Monthly Units Sold <span class="tooltip" title="Estimated monthly sales volume">ⓘ</span></label>
+      <div class="input-wrap">
+        <input type="number" id="units" value="100" min="1" step="1" oninput="calc()" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Other Fees / Unit <span class="tooltip" title="Storage, prep, VAT, insurance, etc. Leave 0 if unsure.">ⓘ</span></label>
+      <div class="input-wrap has-prefix">
+        <span class="input-prefix">$</span>
+        <input type="number" id="other" value="0.50" min="0" step="0.01" oninput="calc()" />
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS CARD -->
+  <div class="card">
+    <div class="card-title">Your Results</div>
+
+    <div class="result-grid">
+      <div class="metric profit" id="m-profit">
+        <div class="val" id="r-profit">—</div>
+        <div class="lbl">Net Profit / Unit</div>
+      </div>
+      <div class="metric roi" id="m-roi">
+        <div class="val" id="r-roi">—</div>
+        <div class="lbl">ROI on COGS</div>
+      </div>
+      <div class="metric margin" id="m-margin">
+        <div class="val" id="r-margin">—</div>
+        <div class="lbl">Net Margin</div>
+      </div>
+      <div class="metric break-even">
+        <div class="val" id="r-be">—</div>
+        <div class="lbl">Break-Even Price</div>
+      </div>
+    </div>
+
+    <div id="verdict" class="verdict good">
+      <span class="verdict-icon">✅</span>
+      <span id="verdict-text">Enter your numbers to see a verdict.</span>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-title">Revenue Breakdown</div>
+      <div class="bar-wrap" id="breakdown-bar">
+        <div class="bar-segment bar-cogs" id="seg-cogs" style="width:0%"></div>
+        <div class="bar-segment bar-fba"  id="seg-fba"  style="width:0%"></div>
+        <div class="bar-segment bar-ppc"  id="seg-ppc"  style="width:0%"></div>
+        <div class="bar-segment bar-profit" id="seg-profit" style="width:0%"></div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#e85555"></div> COGS <span id="l-cogs"></span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f5a623"></div> FBA+Ref <span id="l-fba"></span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7c6af5"></div> PPC <span id="l-ppc"></span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#27c987"></div> Profit <span id="l-profit"></span></div>
+      </div>
+    </div>
+
+    <div class="tips" id="tips-block">
+      <div class="breakdown-title" style="margin-top:16px">Suggestions</div>
+      <div id="tips-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div style="max-width:1000px;margin:0 auto;padding:0 20px">
+  <div class="cta-bar">
+    <h3>Want a full listing audit for your product?</h3>
+    <p>Get a personalized breakdown of your listing's profit leaks, PPC efficiency, and keyword gaps — sent to your inbox, free.</p>
+    <a class="cta-btn" href="mailto:10xwhan@gmail.com?subject=Free%20Listing%20Audit%20Request&body=Hi%2C%20I%27d%20like%20a%20free%20listing%20audit.%20My%20product%20category%20is%3A%20%5BENTER%20CATEGORY%5D.%20My%20ASIN%20is%3A%20%5BASIN%5D.">Request Free Audit →</a>
+  </div>
+</div>
+
+<footer>
+  <p>Built for Amazon FBA sellers in Pet, Home, Skincare & Party Decor. Free forever.<br/>
+  Have feedback? <a href="mailto:10xwhan@gmail.com">Say hi →</a></p>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => n >= 0 ? '$' + n.toFixed(2) : '-$' + Math.abs(n).toFixed(2);
+const pct = n => n.toFixed(1) + '%';
+
+const PRESETS = {
+  pet:      { price: 22.99, cogs: 6.00, fba: 3.80, referral: 15, ppc_total: 250, units: 120, other: 0.40 },
+  home:     { price: 34.99, cogs: 9.50, fba: 5.20, referral: 15, ppc_total: 350, units: 90,  other: 0.60 },
+  skincare: { price: 27.99, cogs: 7.00, fba: 3.40, referral: 8,  ppc_total: 400, units: 150, other: 0.50 },
+  party:    { price: 18.99, cogs: 4.50, fba: 3.20, referral: 15, ppc_total: 150, units: 200, other: 0.30 },
+  custom:   null,
+};
+
+function preset(key) {
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  const p = PRESETS[key];
+  if (!p) return;
+  $('price').value     = p.price;
+  $('cogs').value      = p.cogs;
+  $('fba').value       = p.fba;
+  $('referral').value  = p.referral;
+  $('referral_range').value = p.referral;
+  $('ppc_total').value = p.ppc_total;
+  $('units').value     = p.units;
+  $('other').value     = p.other;
+  calc();
+}
+
+function syncRange(id, val) {
+  $(id).value = val;
+  calc();
+}
+
+function calc() {
+  const price     = parseFloat($('price').value)     || 0;
+  const cogs      = parseFloat($('cogs').value)      || 0;
+  const fba       = parseFloat($('fba').value)       || 0;
+  const referralPct = parseFloat($('referral').value)|| 0;
+  const ppc_total = parseFloat($('ppc_total').value) || 0;
+  const units     = parseFloat($('units').value)     || 1;
+  const other     = parseFloat($('other').value)     || 0;
+
+  // sync range
+  $('referral_range').value = referralPct;
+
+  const referral_fee = price * (referralPct / 100);
+  const ppc_per_unit = ppc_total / units;
+  const total_costs  = cogs + fba + referral_fee + ppc_per_unit + other;
+  const profit       = price - total_costs;
+  const roi          = cogs > 0 ? (profit / cogs) * 100 : 0;
+  const margin       = price > 0 ? (profit / price) * 100 : 0;
+  const break_even   = total_costs;
+
+  // display
+  $('r-profit').textContent  = fmt(profit);
+  $('r-roi').textContent     = pct(roi);
+  $('r-margin').textContent  = pct(margin);
+  $('r-be').textContent      = '$' + break_even.toFixed(2);
+
+  // color
+  const isNeg = profit < 0;
+  $('m-profit').className = 'metric profit' + (isNeg ? ' negative' : '');
+  $('m-roi').className    = 'metric roi'    + (roi < 0 ? ' negative' : '');
+  $('m-margin').className = 'metric margin' + (margin < 20 && margin >= 0 ? '' : isNeg ? ' negative' : '');
+
+  // verdict
+  const vEl  = $('verdict');
+  const vTxt = $('verdict-text');
+  if (profit < 0) {
+    vEl.className = 'verdict bad';
+    vTxt.innerHTML = '🚫 <strong>Losing money on every sale.</strong> Your costs exceed your sale price. Fix COGS, reduce PPC, or raise your price before scaling.';
+  } else if (margin < 15) {
+    vEl.className = 'verdict ok';
+    vTxt.innerHTML = '⚠️ <strong>Thin margins.</strong> Under 15% net margin means any cost increase could wipe your profit. Consider raising price, improving PPC ACOS, or renegotiating COGS.';
+  } else if (roi < 50) {
+    vEl.className = 'verdict ok';
+    vTxt.innerHTML = '⚠️ <strong>Decent margins, low ROI.</strong> You're profitable but your capital isn't working hard enough. Can you lower COGS or reduce stock holding time?';
+  } else {
+    vEl.className = 'verdict good';
+    vTxt.innerHTML = '✅ <strong>Healthy listing.</strong> Strong margins and ROI. This is worth scaling — focus on increasing units through PPC or external traffic.';
+  }
+
+  // breakdown bar
+  const cogs_pct    = price > 0 ? Math.max(0, (cogs / price) * 100) : 0;
+  const fba_pct     = price > 0 ? Math.max(0, ((fba + referral_fee + other) / price) * 100) : 0;
+  const ppc_pct     = price > 0 ? Math.max(0, (ppc_per_unit / price) * 100) : 0;
+  const profit_pct  = Math.max(0, margin);
+  const total_shown = Math.min(100, cogs_pct + fba_pct + ppc_pct + profit_pct);
+
+  $('seg-cogs').style.width   = cogs_pct + '%';
+  $('seg-fba').style.width    = fba_pct + '%';
+  $('seg-ppc').style.width    = ppc_pct + '%';
+  $('seg-profit').style.width = profit_pct + '%';
+
+  $('l-cogs').textContent   = ' ' + pct(cogs_pct);
+  $('l-fba').textContent    = ' ' + pct(fba_pct);
+  $('l-ppc').textContent    = ' ' + pct(ppc_pct);
+  $('l-profit').textContent = ' ' + pct(profit_pct);
+
+  // tips
+  const tips = [];
+  if (ppc_per_unit / price > 0.20)
+    tips.push({ icon: '📣', text: '<strong>PPC is eating 20%+ of revenue.</strong> Your ACOS is high. Test reducing bids on broad match keywords and focus budget on exact match converters.' });
+  if (referralPct >= 15 && (cogs < price * 0.25))
+    tips.push({ icon: '🏷️', text: '<strong>Consider a price test.</strong> Your referral fee category has a fixed %. At your COGS, raising price by $2–3 directly lifts profit without proportional cost increase.' });
+  if (fba > price * 0.18)
+    tips.push({ icon: '📏', text: '<strong>FBA fee is large relative to price.</strong> Check your product dimensions — even a small change in packaging can drop you to a lower size tier.' });
+  if (roi > 100)
+    tips.push({ icon: '🚀', text: '<strong>Strong ROI — ready to scale.</strong> Consider increasing inventory investment and testing external traffic (TikTok, Meta) to grow volume without raising PPC ACOS.' });
+  if (tips.length === 0 && profit > 0)
+    tips.push({ icon: '📊', text: 'Your numbers look solid. Keep tracking ACOS monthly — PPC efficiency is usually the first place profit erodes as competition increases.' });
+
+  $('tips-content').innerHTML = tips.map(t =>
+    `<div class="tip"><span class="tip-icon">${t.icon}</span><span>${t.text}</span></div>`
+  ).join('');
+}
+
+// init
+calc();
+</script>
+</body>
+</html>
